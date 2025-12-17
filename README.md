@@ -24,12 +24,12 @@ This system is a **real-time voice intelligence platform** designed to capture a
 ```mermaid
 graph TD
     %% Clients
-    Client[Mobile App / BLE Device] -->|WebSocket Audio Stream| Gateway[Ingest Gateway Service]
+    Client["Mobile App / BLE Device"] -->|WebSocket Audio Stream| Gateway[Ingest Gateway Service]
     Client -->|REST / gRPC| API[Ask-Neo API]
 
     %% Ingest Layer
-    Gateway -->|1. Write Audio| GCS[Google Cloud Storage (Tmp)]
-    Gateway -->|2. Produce Event| Kafka{Kafka / Strimzi}
+    Gateway -->|1. Write Audio| GCS["Google Cloud Storage (Tmp)"]
+    Gateway -->|2. Produce Event| Kafka{"Kafka / Strimzi"}
 
     %% Processing Layer (Async Workers)
     subgraph "AI Processing Cluster (GKE Node Pool)"
@@ -47,9 +47,9 @@ graph TD
 
     %% Storage Layer
     subgraph "Persistence Layer"
-        Redis[(Redis - Session State)]
-        Postgres[(Cloud SQL - Metadata & Graph)]
-        Pinecone[(Pinecone - Vector Index)]
+        Redis[("Redis - Session State")]
+        Postgres[("Cloud SQL - Metadata & Graph")]
+        Pinecone[("Pinecone - Vector Index")]
     end
 
     Gateway -.->|Session Heartbeat| Redis
@@ -61,7 +61,6 @@ graph TD
     API -->|Hybrid Query| Pinecone
     API -->|Relational Query| Postgres
     API -->|Get Session State| Redis
-
 ```
 
 ---
