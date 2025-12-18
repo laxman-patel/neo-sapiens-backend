@@ -1,0 +1,16 @@
+{
+  "name": "client-device",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@bufbuild/protoc-gen-es": "^2.10.2",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.10.2"
+  }
+}

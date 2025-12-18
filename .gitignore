@@ -1,0 +1,52 @@
+# --- Dependencies ---
+node_modules/
+# Bun uses node_modules, but its install process is much faster.
+# Always exclude this.
+
+# --- Bun specific ---
+# If you prefer not to commit the binary lockfile (optional)
+# bun.lockb
+# Note: It is generally recommended to COMMIIT bun.lockb to ensure
+# consistent installs across environments.
+
+# --- Environment Secrets ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.bak
+
+# --- Logs ---
+bun.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# --- Build Output ---
+dist/
+out/
+build/
+*.exe
+*.dll
+*.dylib
+*.so
+
+# --- IDE / System Files ---
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- Test Coverage ---
+coverage/
+.nyc_output/
+
+# --- Bun's specific cache (if running in custom environments) ---
+.bun-cache/

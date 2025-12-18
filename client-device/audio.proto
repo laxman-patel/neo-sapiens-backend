@@ -1,0 +1,10 @@
+// audio.proto
+syntax = "proto3";
+
+package audio;
+
+message AudioPacket {
+  uint32 sequence_id = 1;
+  bytes audio_data = 2;
+  int64 timestamp = 3;  // Useful for latency calculations
+}
