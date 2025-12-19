@@ -1,11 +1,14 @@
 import { spawn } from "bun";
 import { AudioPacketSchema } from "./audio_pb";
-import { unlink } from "node:fs/promises"; // NOTE: Bun still recommends this for deletion
+import { unlink } from "node:fs/promises";
 import { create, toBinary } from "@bufbuild/protobuf";
 
 const CONFIG = {
   inputPath: "./input.wav",
   wsUrl: "ws://localhost:8080",
+  authUrl: "http://localhost:8080/auth/login",
+  deviceId: "device-001",
+  deviceSecret: "secret-001",
   bufferDir: "./buffer",
   reconnectInterval: 3000,
 };
@@ -15,6 +18,7 @@ await Bun.spawn(["mkdir", "-p", CONFIG.bufferDir]).exited;
 
 export class StreamManager {
   private socket: WebSocket | null = null;
+  private accessToken: string | null = null;
   private sequenceId = 0;
   private isFlushing = false;
 
@@ -24,9 +28,20 @@ export class StreamManager {
   }
 
   // --- 1. NETWORK MANAGEMENT ---
-  private connect() {
+  private async connect() {
+    // 1. Authenticate first
+    try {
+      this.accessToken = await this.login();
+    } catch (e) {
+      console.log("[net] Auth failed, retrying in 3s...");
+      setTimeout(() => this.connect(), CONFIG.reconnectInterval);
+      return;
+    }
+
+    // 2. Connect with token
     console.log("[net] Connecting...");
-    this.socket = new WebSocket(CONFIG.wsUrl);
+    const wsUrlWithToken = `${CONFIG.wsUrl}?token=${this.accessToken}`;
+    this.socket = new WebSocket(wsUrlWithToken);
 
     this.socket.addEventListener("open", async () => {
       console.log("[net] Online");
@@ -37,6 +52,32 @@ export class StreamManager {
       console.log("[net] Disconnected");
       setTimeout(() => this.connect(), CONFIG.reconnectInterval);
     });
+  }
+
+  private async login(): Promise<string> {
+    console.log("[auth] Logging in...");
+    try {
+      const response = await fetch(CONFIG.authUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deviceId: CONFIG.deviceId,
+          deviceSecret: CONFIG.deviceSecret,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Login failed: ${response.status} ${text}`);
+      }
+
+      const data = (await response.json()) as { accessToken: string };
+      console.log("[auth] Login successful");
+      return data.accessToken;
+    } catch (error) {
+      console.error("[auth] Error:", error);
+      throw error;
+    }
   }
 
   // --- 2. DATA HANDLING ---
