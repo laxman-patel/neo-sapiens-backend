@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  kong:
+    image: kong:3.4
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      # Ensure JWT plugin is available (it is bundled)
+    ports:
+      - "8080:8000"
+      - "8001:8001"
+    networks:
+      - kong-net
+    restart: on-failure
+
+  auth-service:
+    build: ../auth-service
+    environment:
+      JWT_SECRET: test-secret
+      JWT_ISSUER: test-issuer
+    networks:
+      - kong-net
+
+  ingest-service:
+    build: ../ingest-service
+    networks:
+      - kong-net
+
+networks:
+  kong-net:

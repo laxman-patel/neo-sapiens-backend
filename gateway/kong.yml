@@ -1,0 +1,41 @@
+_format_version: "3.0"
+
+services:
+  - name: auth-service
+    url: http://auth-service:3000
+    routes:
+      - name: auth-route
+        paths:
+          - /auth/login
+        strip_path: false
+        methods:
+          - POST
+
+  - name: ingest-service
+    url: http://ingest-service:4000
+    routes:
+      - name: ingest-route
+        paths:
+          - /
+        protocols:
+          - http
+          - https
+          - ws
+          - wss
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          key_claim_name: iss
+          secret_is_base64: false
+          uri_param_names:
+            - token
+          # We might need to allow anonymous for options/preflight if browser,
+          # but this is a native client.
+
+consumers:
+  - username: device-001
+    jwt_secrets:
+      - key: test-issuer
+        secret: test-secret
+        algorithm: HS256

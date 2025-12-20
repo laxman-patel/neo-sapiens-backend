@@ -27,7 +27,6 @@ export class StreamManager {
     this.startFFmpeg();
   }
 
-  // --- 1. NETWORK MANAGEMENT ---
   private async connect() {
     // 1. Authenticate first
     try {
@@ -80,7 +79,6 @@ export class StreamManager {
     }
   }
 
-  // --- 2. DATA HANDLING ---
   public async handleChunk(chunk: Uint8Array) {
     this.sequenceId++;
 
@@ -100,7 +98,6 @@ export class StreamManager {
     }
   }
 
-  // --- 3. DISK BUFFERING (Bun Native) ---
   private async saveToDisk(id: number, data: Uint8Array) {
     const filename = `${CONFIG.bufferDir}/${id.toString().padStart(10, "0")}.bin`;
 
@@ -156,8 +153,7 @@ export class StreamManager {
     }
   }
 
-  // --- 4. AUDIO CAPTURE ---
-  private startFFmpeg() {
+  private async startFFmpeg() {
     const ffmpegCmd = [
       "ffmpeg",
       "-re",
@@ -176,12 +172,10 @@ export class StreamManager {
 
     const proc = spawn(ffmpegCmd, { stdout: "pipe", stderr: "ignore" });
 
-    (async () => {
-      if (!proc.stdout) return;
-      for await (const chunk of proc.stdout) {
-        await this.handleChunk(chunk);
-      }
-    })();
+    if (!proc.stdout) return;
+    for await (const chunk of proc.stdout) {
+      await this.handleChunk(chunk);
+    }
   }
 }
 
