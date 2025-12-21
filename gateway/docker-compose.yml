@@ -30,7 +30,9 @@ services:
       - kong-net
 
   ingest-service:
-    build: ../ingest-service
+    build:
+      context: ..
+      dockerfile: ingest-service/Dockerfile
     networks:
       - kong-net
 

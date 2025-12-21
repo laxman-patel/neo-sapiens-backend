@@ -13,7 +13,10 @@ Bun.serve({
 
     if (url.pathname === "/auth/login" && req.method === "POST") {
       try {
-        const body = (await req.json()) as { deviceId?: string; deviceSecret?: string };
+        const body = (await req.json()) as {
+          deviceId?: string;
+          deviceSecret?: string;
+        };
         const { deviceId, deviceSecret } = body;
         console.log(`Login attempt for device: ${deviceId}`);
 
@@ -24,7 +27,7 @@ Bun.serve({
               iss: JWT_ISSUER,
             },
             JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "1h" },
           );
           console.log("Token issued");
           return Response.json({ accessToken: token });

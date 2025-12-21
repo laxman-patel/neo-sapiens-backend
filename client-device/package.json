@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "generate": "bun x protoc --es_out=. --es_opt=target=ts --proto_path=../shared/proto ../shared/proto/audio.proto"
+  },
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^2.10.2",
     "@types/bun": "latest"

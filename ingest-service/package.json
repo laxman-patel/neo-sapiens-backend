@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "module": "index.ts",
   "type": "module",
-  "dependencies": {},
+  "scripts": {
+    "generate": "bun x protoc --es_out=. --es_opt=target=ts --proto_path=../shared/proto ../shared/proto/audio.proto"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.10.2",
+    "@bufbuild/protoc-gen-es": "^2.10.2"
+  },
   "devDependencies": {
     "bun-types": "latest",
     "@types/bun": "latest"
